@@ -41,9 +41,10 @@ app.UseMiddleware<GlobalExceptionHandlerMiddleware>();
 app.UseHttpsRedirection();
 app.UseRouting();
 
-app.UseSession();           // Add session middleware
-app.UseAuthentication();
-app.UseAuthorization();
+app.UseSession();                          // Add session middleware
+app.UseAuthentication();                   // Must be after routing, before authorization
+app.UseAuthorization();                    // Enforce authorization policies
+app.UseMiddleware<AuthenticationCheckMiddleware>();  // Check if user is blocked & update activity
 
 app.MapStaticAssets();
 

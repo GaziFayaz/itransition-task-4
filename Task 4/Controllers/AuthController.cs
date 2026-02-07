@@ -1,6 +1,7 @@
-﻿﻿using System.Security.Claims;
+﻿﻿﻿﻿﻿﻿using System.Security.Claims;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Task_4.Data;
@@ -10,6 +11,7 @@ using Task_4.Models.ViewModels;
 
 namespace Task_4.Controllers;
 
+[AllowAnonymous]
 public class AuthController : Controller
 {
     private readonly AppDbContext _context;
@@ -29,6 +31,11 @@ public class AuthController : Controller
     [HttpGet]
     public IActionResult Register()
     {
+        // Redirect authenticated users to home
+        if (User.Identity?.IsAuthenticated == true)
+        {
+            return RedirectToAction("Index", "Home");
+        }
         return View();
     }
 
@@ -96,8 +103,20 @@ public class AuthController : Controller
     }
 
     [HttpGet]
-    public IActionResult Login()
+    public IActionResult Login(bool blocked = false)
     {
+        // Redirect authenticated users to home
+        if (User.Identity?.IsAuthenticated == true)
+        {
+            return RedirectToAction("Index", "Home");
+        }
+        
+        // Show message if user was blocked
+        if (blocked)
+        {
+            TempData.SetErrorMessage("Your account has been blocked.");
+        }
+        
         return View();
     }
 
