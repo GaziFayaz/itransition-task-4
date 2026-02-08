@@ -1,4 +1,5 @@
-﻿@using System.Security.Claims
+﻿﻿@using System.Security.Claims
+@using System.Security.Claims
 @model List<Task_4.Models.User>
 @{
     ViewData["Title"] = "User Management";
@@ -27,15 +28,27 @@
             var currentUser = Model.FirstOrDefault(u => u.Id == currentUserId);
             if (currentUser != null && currentUser.Status == Task_4.Models.Status.Unverified)
             {
-                <button id="verifyBtn" class="btn btn-primary me-2">
-                    <i class="bi bi-check-circle-fill"></i> Verify Me
-                </button>
+                <form asp-action="ResendVerification" asp-controller="Auth" method="post" style="display: inline;">
+                    <button type="submit" class="btn btn-info me-2">
+                        <i class="bi bi-envelope-fill"></i> Resend Verification Email
+                    </button>
+                </form>
             }
         }
         <a href="/Auth/Logout" class="btn btn-secondary">
             <i class="bi bi-box-arrow-right"></i> Logout
         </a>
     </div>
+
+    @{
+        if (currentUser != null && currentUser.Status == Task_4.Models.Status.Unverified)
+        {
+            <div class="alert alert-warning" role="alert">
+                <i class="bi bi-exclamation-triangle-fill"></i>
+                <strong>Email Verification Required:</strong> Please check your email and click the verification link to activate your account.
+            </div>
+        }
+    }
 
     <!-- Users Table -->
     <div class="table-responsive">
@@ -169,26 +182,6 @@
                         performAction('/Home/DeleteUsers', selectedIds, 'delete');
                     }
                 }
-            });
-
-            // Verify button click
-            $('#verifyBtn').on('click', function () {
-                const form = $('<form>', {
-                    method: 'POST',
-                    action: '/Home/VerifyMe'
-                });
-
-                const token = $('input[name="__RequestVerificationToken"]').val();
-                if (token) {
-                    form.append($('<input>', {
-                        type: 'hidden',
-                        name: '__RequestVerificationToken',
-                        value: token
-                    }));
-                }
-
-                $('body').append(form);
-                form.submit();
             });
 
             function performAction(url, userIds, action) {

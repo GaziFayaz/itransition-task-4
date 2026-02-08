@@ -1,7 +1,9 @@
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
+using Resend;
 using Task_4.Data;
 using Task_4.Middleware;
+using Task_4.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -9,6 +11,18 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllersWithViews();
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseAzureSql(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+// Configure Resend
+builder.Services.AddOptions<ResendClientOptions>().Configure(o =>
+{
+    o.ApiToken = builder.Configuration["Resend:ApiKey"] ?? throw new InvalidOperationException("Resend API key not configured");
+});
+builder.Services.AddHttpClient<ResendClient>();
+builder.Services.AddTransient<IResend, ResendClient>();
+
+// Register email service
+builder.Services.AddScoped<IEmailService, EmailService>();
+
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options =>
     {

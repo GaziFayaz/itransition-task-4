@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿﻿using Microsoft.EntityFrameworkCore;
 using Task_4.Models;
 
 namespace Task_4.Data;
@@ -49,6 +49,11 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
             entity.Property(u => u.LastActivityAt)
                 .IsRequired()
                 .HasDefaultValue(null);
+            
+            entity.Property(u => u.EmailVerificationToken)
+                .HasMaxLength(100);
+
+            entity.Property(u => u.EmailVerificationTokenExpiry);
         });
     }
 }

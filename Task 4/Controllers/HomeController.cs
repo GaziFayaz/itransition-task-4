@@ -35,46 +35,6 @@ namespace Task_4.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> VerifyMe()
-        {
-            try
-            {
-                var currentUserId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "0");
-                var currentUser = await _context.Users.FindAsync(currentUserId);
-
-                if (currentUser == null)
-                {
-                    TempData.SetErrorMessage("User not found");
-                    return RedirectToAction(nameof(Index));
-                }
-
-                if (currentUser.Status == Status.Verified)
-                {
-                    TempData.SetInfoMessage("You are already verified");
-                    return RedirectToAction(nameof(Index));
-                }
-
-                if (currentUser.Status == Status.Blocked)
-                {
-                    TempData.SetErrorMessage("Cannot verify a blocked account");
-                    return RedirectToAction(nameof(Index));
-                }
-
-                currentUser.Status = Status.Verified;
-                await _context.SaveChangesAsync();
-
-                TempData.SetSuccessMessage("Your account has been verified successfully!");
-                return RedirectToAction(nameof(Index));
-            }
-            catch (Exception ex)
-            {
-                TempData.SetErrorMessage("An error occurred while verifying your account");
-                return RedirectToAction(nameof(Index));
-            }
-        }
-
-        [HttpPost]
-        [ValidateAntiForgeryToken]
         public async Task<IActionResult> BlockUsers(List<int>? userIds)
         {
             if (userIds == null || userIds.Count == 0)
@@ -144,7 +104,7 @@ namespace Task_4.Controllers
 
                 foreach (var user in users)
                 {
-                    user.Status = Status.Verified;
+                    user.Status = Status.Unverified;
                 }
 
                 await _context.SaveChangesAsync();

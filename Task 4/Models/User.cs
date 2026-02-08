@@ -27,4 +27,8 @@ public class User
     public DateTime? LastLoggedInAt { get; set; } = null;
 
     public DateTime? LastActivityAt { get; set; } = null;
+
+    public string? EmailVerificationToken { get; set; } = null;
+
+    public DateTime? EmailVerificationTokenExpiry { get; set; } = null;
 }
