@@ -57,7 +57,6 @@ public class AuthController : Controller
                     PasswordHash = passwordHash,
                     CreatedAt = DateTime.UtcNow,
                     Status = Status.Unverified,
-                    IsBlocked = false,
                     LastActivityAt = DateTime.UtcNow,
                     LastLoggedInAt = DateTime.UtcNow
                 };
@@ -137,7 +136,7 @@ public class AuthController : Controller
                 }
 
                 // Check if user is blocked
-                if (user.IsBlocked)
+                if (user.Status == Status.Blocked)
                 {
                     ModelState.AddModelError(string.Empty, "Your account has been blocked");
                     return View(model);

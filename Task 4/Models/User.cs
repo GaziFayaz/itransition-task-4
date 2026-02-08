@@ -6,6 +6,7 @@ public enum Status
 {
     Verified = 1,
     Unverified = 2,
+    Blocked = 3
 }
 
 public class User
@@ -22,8 +23,6 @@ public class User
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
     public Status Status { get; set; } = Status.Unverified;
-
-    public bool IsBlocked { get; set; } = false;
 
     public DateTime? LastLoggedInAt { get; set; } = null;
 

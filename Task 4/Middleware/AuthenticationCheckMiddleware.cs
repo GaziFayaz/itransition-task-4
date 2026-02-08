@@ -39,7 +39,7 @@ public class AuthenticationCheckMiddleware
                     if (user != null)
                     {
                         // Check if user is blocked
-                        if (user.IsBlocked)
+                        if (user.Status == Status.Blocked)
                         {
                             _logger.LogWarning("Blocked user {UserId} ({Email}) attempted to access the application", 
                                 user.Id, user.Email);

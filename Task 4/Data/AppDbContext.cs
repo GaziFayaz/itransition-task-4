@@ -38,10 +38,6 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
                 .IsRequired()
                 .HasDefaultValueSql("GETUTCDATE()"); // For SQL Server
 
-            entity.Property(u => u.IsBlocked)
-                .IsRequired()
-                .HasDefaultValue(false);
-
             entity.Property(u => u.Status)
                 .IsRequired()
                 .HasDefaultValue(Status.Unverified);
