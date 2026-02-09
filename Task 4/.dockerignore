@@ -1,0 +1,13 @@
+﻿bin/
+obj/
+.git/
+.gitignore
+README.md
+.vs/
+.vscode/
+*.user
+.DS_Store
+temp/
+Migrations/
+Properties/
+wwwroot/

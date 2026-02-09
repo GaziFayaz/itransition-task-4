@@ -1,18 +1,16 @@
-﻿﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Task_4.Models;
 
 namespace Task_4.Data;
 
 public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(options)
 {
-    // DbSet properties - each represents a table in your database
     public DbSet<User> Users { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
 
-        // ===== User Configuration =====
         modelBuilder.Entity<User>(entity =>
         {
             entity.ToTable("Users");
@@ -30,13 +28,12 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
                 .IsRequired()
                 .HasMaxLength(255);
 
-            // Create unique index on Email
             entity.HasIndex(u => u.Email)
                 .IsUnique();
 
             entity.Property(u => u.CreatedAt)
                 .IsRequired()
-                .HasDefaultValueSql("GETUTCDATE()"); // For SQL Server
+                .HasDefaultValueSql("GETUTCDATE()");
 
             entity.Property(u => u.Status)
                 .IsRequired()
@@ -49,7 +46,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
             entity.Property(u => u.LastActivityAt)
                 .IsRequired()
                 .HasDefaultValue(null);
-            
+
             entity.Property(u => u.EmailVerificationToken)
                 .HasMaxLength(100);
 

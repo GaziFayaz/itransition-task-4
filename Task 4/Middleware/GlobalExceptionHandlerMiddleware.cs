@@ -28,16 +28,15 @@ public class GlobalExceptionHandlerMiddleware
 
     private static Task HandleExceptionAsync(HttpContext context, Exception exception)
     {
-        // Store error message in TempData for toast notification
-        var tempDataProvider = context.RequestServices.GetRequiredService<Microsoft.AspNetCore.Mvc.ViewFeatures.ITempDataDictionaryFactory>();
+        var tempDataProvider = context.RequestServices
+            .GetRequiredService<Microsoft.AspNetCore.Mvc.ViewFeatures.ITempDataDictionaryFactory>();
         var tempData = tempDataProvider.GetTempData(context);
-        
+
         tempData["ErrorMessage"] = "An unexpected error occurred. Please try again.";
-        
-        // Redirect to referrer or home page
+
         var referer = context.Request.Headers["Referer"].ToString();
         context.Response.Redirect(string.IsNullOrEmpty(referer) ? "/" : referer);
-        
+
         return Task.CompletedTask;
     }
 }

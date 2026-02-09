@@ -7,20 +7,26 @@ using Task_4.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
 builder.Services.AddControllersWithViews();
+
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+if (string.IsNullOrEmpty(connectionString))
+{
+    throw new InvalidOperationException(
+        "DefaultConnection not configured. Set via appsettings.json, environment variable, or Azure Key Vault.");
+}
+
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseAzureSql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-// Configure Resend
 builder.Services.AddOptions<ResendClientOptions>().Configure(o =>
 {
-    o.ApiToken = builder.Configuration["Resend:ApiKey"] ?? throw new InvalidOperationException("Resend API key not configured");
+    o.ApiToken = builder.Configuration["Resend:ApiKey"] ??
+                 throw new InvalidOperationException("Resend API key not configured");
 });
 builder.Services.AddHttpClient<ResendClient>();
 builder.Services.AddTransient<IResend, ResendClient>();
 
-// Register email service
 builder.Services.AddScoped<IEmailService, EmailService>();
 
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
@@ -49,22 +55,21 @@ if (!app.Environment.IsDevelopment())
     app.UseHsts();
 }
 
-// Add global exception handler middleware
 app.UseMiddleware<GlobalExceptionHandlerMiddleware>();
 
 app.UseHttpsRedirection();
 app.UseRouting();
 
-app.UseSession();                          // Add session middleware
-app.UseAuthentication();                   // Must be after routing, before authorization
-app.UseAuthorization();                    // Enforce authorization policies
-app.UseMiddleware<AuthenticationCheckMiddleware>();  // Check if user is blocked & update activity
+app.UseSession();
+app.UseAuthentication();
+app.UseAuthorization();
+app.UseMiddleware<AuthenticationCheckMiddleware>();
 
 app.MapStaticAssets();
 
 app.MapControllerRoute(
-    name: "default",
-    pattern: "{controller=Auth}/{action=Login}/{id?}")
+        name: "default",
+        pattern: "{controller=Auth}/{action=Login}/{id?}")
     .WithStaticAssets();
 
 app.Run();

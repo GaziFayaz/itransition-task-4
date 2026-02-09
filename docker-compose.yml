@@ -1,0 +1,22 @@
+﻿version: '3.8'
+
+services:
+  task4-app:
+    build:
+      context: ./Task\ 4
+      dockerfile: Dockerfile
+    container_name: task4-app
+    ports:
+      - "80:80"
+      - "443:443"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      - ASPNETCORE_URLS=http://+:80
+      - ConnectionStrings__DefaultConnection=${DB_CONNECTION_STRING}
+      - Resend__ApiKey=${RESEND_API_KEY}
+    restart: always
+    # Uncomment for production with SSL
+    # volumes:
+    #   - ./certs:/etc/letsencrypt
+    # ports:
+    #   - "443:443"

@@ -63,10 +63,10 @@ namespace Task_4.Controllers
 
                 await _context.SaveChangesAsync();
 
-                // Check if current user blocked themselves
                 if (userIds.Contains(currentUserId))
                 {
-                    TempData.SetSuccessMessage($"{users.Count} user(s) blocked. You blocked yourself and will be logged out.");
+                    TempData.SetSuccessMessage(
+                        $"{users.Count} user(s) blocked. You blocked yourself and will be logged out.");
                     return RedirectToAction("Logout", "Auth");
                 }
 
@@ -145,10 +145,10 @@ namespace Task_4.Controllers
                 _context.Users.RemoveRange(users);
                 await _context.SaveChangesAsync();
 
-                // Check if current user deleted themselves
                 if (userIds.Contains(currentUserId))
                 {
-                    TempData.SetSuccessMessage($"{users.Count} user(s) deleted. You deleted yourself and will be logged out.");
+                    TempData.SetSuccessMessage(
+                        $"{users.Count} user(s) deleted. You deleted yourself and will be logged out.");
                     return RedirectToAction("Logout", "Auth");
                 }
 

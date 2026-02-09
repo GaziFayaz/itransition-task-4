@@ -1,4 +1,4 @@
-﻿﻿﻿using System.Security.Claims;
+﻿using System.Security.Claims;
 using System.Security.Cryptography;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
@@ -21,7 +21,8 @@ public class AuthController : Controller
     private readonly IEmailService _emailService;
     private readonly IConfiguration _configuration;
 
-    public AuthController(AppDbContext context, ILogger<AuthController> logger, IEmailService emailService, IConfiguration configuration)
+    public AuthController(AppDbContext context, ILogger<AuthController> logger, IEmailService emailService,
+        IConfiguration configuration)
     {
         _context = context;
         _logger = logger;
@@ -37,11 +38,11 @@ public class AuthController : Controller
     [HttpGet]
     public IActionResult Register()
     {
-        // Redirect authenticated users to home
         if (User.Identity?.IsAuthenticated == true)
         {
             return RedirectToAction("Index", "Home");
         }
+
         return View();
     }
 
@@ -52,14 +53,11 @@ public class AuthController : Controller
         {
             try
             {
-                // Hash password using BCrypt
                 var passwordHash = BCrypt.Net.BCrypt.HashPassword(model.Password);
 
-                // Generate verification token
                 var verificationToken = GenerateSecureToken();
                 var tokenExpiry = DateTime.UtcNow.AddHours(24);
 
-                // Create new user
                 var user = new User
                 {
                     Name = model.Name,
@@ -76,7 +74,6 @@ public class AuthController : Controller
                 _context.Users.Add(user);
                 await _context.SaveChangesAsync();
 
-                // Send verification email
                 try
                 {
                     var verificationLink = Url.Action(
@@ -87,12 +84,14 @@ public class AuthController : Controller
                     );
 
                     await _emailService.SendVerificationEmailAsync(user.Email, user.Name, verificationLink!);
-                    TempData.SetSuccessMessage("Registration successful! Please check your email to verify your account.");
+                    TempData.SetSuccessMessage(
+                        "Registration successful! Please check your email to verify your account.");
                 }
                 catch (Exception ex)
                 {
                     _logger.LogError(ex, "Failed to send verification email to {Email}", model.Email);
-                    TempData.SetWarningMessage("Registration successful, but we couldn't send the verification email. Please contact support.");
+                    TempData.SetWarningMessage(
+                        "Registration successful, but we couldn't send the verification email. Please contact support.");
                 }
 
                 return RedirectToAction("Login");
@@ -100,11 +99,10 @@ public class AuthController : Controller
             catch (DbUpdateException ex)
             {
                 _logger.LogError(ex, "Database error during user registration for email: {Email}", model.Email);
-                
-                // Detect specific constraint violations
+
                 string errorMessage = "Unable to complete registration. Please try again.";
-                
-                if (ex.InnerException?.Message.Contains("Email") == true || 
+
+                if (ex.InnerException?.Message.Contains("Email") == true ||
                     ex.InnerException?.Message.Contains("UNIQUE constraint") == true)
                 {
                     errorMessage = "This email is already registered. Please use a different email or try logging in.";
@@ -112,11 +110,10 @@ public class AuthController : Controller
                 }
                 else
                 {
-                    // Log the full error for debugging
-                    _logger.LogError("DbUpdateException details - InnerException: {InnerException}", 
+                    _logger.LogError("DbUpdateException details - InnerException: {InnerException}",
                         ex.InnerException?.Message);
                 }
-                
+
                 TempData.SetErrorMessage(errorMessage);
                 return View(model);
             }
@@ -134,18 +131,16 @@ public class AuthController : Controller
     [HttpGet]
     public IActionResult Login(bool blocked = false)
     {
-        // Redirect authenticated users to home
         if (User.Identity?.IsAuthenticated == true)
         {
             return RedirectToAction("Index", "Home");
         }
-        
-        // Show message if user was blocked
+
         if (blocked)
         {
             TempData.SetErrorMessage("Your account has been blocked.");
         }
-        
+
         return View();
     }
 
@@ -156,7 +151,6 @@ public class AuthController : Controller
         {
             try
             {
-                // Find user by email
                 var user = await _context.Users.SingleOrDefaultAsync(u => u.Email == model.Email);
 
                 if (user == null || !BCrypt.Net.BCrypt.Verify(model.Password, user.PasswordHash))
@@ -165,14 +159,12 @@ public class AuthController : Controller
                     return View(model);
                 }
 
-                // Check if user is blocked
                 if (user.Status == Status.Blocked)
                 {
                     ModelState.AddModelError(string.Empty, "Your account has been blocked");
                     return View(model);
                 }
 
-                // Update last login time (non-critical - continue even if it fails)
                 try
                 {
                     user.LastLoggedInAt = DateTime.UtcNow;
@@ -182,10 +174,8 @@ public class AuthController : Controller
                 catch (Exception ex)
                 {
                     _logger.LogWarning(ex, "Failed to update last login time for user: {UserId}", user.Id);
-                    // Continue with login even if timestamp update fails
                 }
 
-                // Create authentication claims
                 var claims = new List<Claim>
                 {
                     new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
@@ -272,7 +262,6 @@ public class AuthController : Controller
                 return RedirectToAction("ResendVerification", new { email = email });
             }
 
-            // Verify the user
             user.Status = Status.Verified;
             user.EmailVerificationToken = null;
             user.EmailVerificationTokenExpiry = null;
@@ -316,7 +305,6 @@ public class AuthController : Controller
                 return RedirectToAction("Index", "Home");
             }
 
-            // Generate new verification token
             var verificationToken = GenerateSecureToken();
             var tokenExpiry = DateTime.UtcNow.AddHours(24);
 
@@ -324,7 +312,6 @@ public class AuthController : Controller
             user.EmailVerificationTokenExpiry = tokenExpiry;
             await _context.SaveChangesAsync();
 
-            // Send verification email
             var verificationLink = Url.Action(
                 "VerifyEmail",
                 "Auth",

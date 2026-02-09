@@ -16,13 +16,13 @@
 
                     <div class="mb-3">
                         <label asp-for="Email" class="form-label"></label>
-                        <input asp-for="Email" class="form-control" placeholder="Enter your email" />
+                        <input asp-for="Email" class="form-control" placeholder="Enter your email"/>
                         <span asp-validation-for="Email" class="text-danger"></span>
                     </div>
 
                     <div class="mb-3">
                         <label asp-for="Password" class="form-label"></label>
-                        <input asp-for="Password" class="form-control" type="password" placeholder="Enter password" />
+                        <input asp-for="Password" class="form-control" type="password" placeholder="Enter password"/>
                         <span asp-validation-for="Password" class="text-danger"></span>
                     </div>
 
@@ -39,5 +39,5 @@
 </div>
 
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    @{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); }
 }
