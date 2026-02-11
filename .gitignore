@@ -3,6 +3,19 @@
 ##
 ## Get latest from https://github.com/github/gitignore/blob/master/VisualStudio.gitignore
 
+# ========================================
+# SECURITY: Environment Variables & Secrets
+# ========================================
+.env
+.env.*
+!.env.example
+*.env
+secrets/
+secrets.json
+appsettings.Secrets.json
+connection_string.txt
+resend_key.txt
+
 # User-specific files
 *.rsuser
 *.suo
