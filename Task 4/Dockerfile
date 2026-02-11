@@ -24,7 +24,6 @@ COPY --from=publish /app/publish .
 
 # Set environment variables for production
 ENV ASPNETCORE_ENVIRONMENT=Production
-ENV ASPNETCORE_URLS=http://+:80
 
 # Health check
 HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
